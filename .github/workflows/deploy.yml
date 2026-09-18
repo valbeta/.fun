@@ -36,6 +36,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22222
           source: "out/**" # 指定要传输的本地文件夹（Next.js 静态导出的目录）
           target: "/var/www/valbeta" # 指定 ECS 上的目标目录
           strip_components: 1 # 去除 out 这一层目录，直接把内容放进 target
