@@ -1,4 +1,4 @@
-# Val_beta web beta
+# Val_beta web beta v.02
 
 This branch is the content-first rebuild of [valbeta.fun](https://valbeta.fun).
 
