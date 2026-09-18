@@ -1,0 +1,1 @@
+export default function Loading() { return <section className="article-page"><div className="path">LOADING / PUBLIC LAYER</div><h1>Opening the experiment…</h1><p>Preparing the next loop.</p></section>; }
