@@ -1,0 +1,41 @@
+name: Deploy to ECS
+
+# 触发条件：当代码推送到 master 分支时执行
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # 在 GitHub 提供的 Ubuntu 云端服务器上运行
+    
+    steps:
+      # 步骤 1：下载你的代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 步骤 2：安装 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+
+      # 步骤 3：安装项目依赖
+      - name: Install dependencies
+        run: npm ci
+
+      # 步骤 4：构建静态网站（生成 out 文件夹）
+      - name: Build static site
+        run: npm run build
+
+      # 步骤 5：通过 SCP 协议将构建好的文件传输到阿里云 ECS
+      - name: Deploy to ECS via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "out/**" # 指定要传输的本地文件夹（Next.js 静态导出的目录）
+          target: "/var/www/valbeta" # 指定 ECS 上的目标目录
+          strip_components: 1 # 去除 out 这一层目录，直接把内容放进 target
