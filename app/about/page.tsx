@@ -1,0 +1,3 @@
+import { Markdown } from "@/components/content/markdown";
+export const metadata={title:"About"};
+export default function About(){return <article className="article-page"><div className="path">~/valbeta/about</div><h1>A person, run as a laboratory.</h1><Markdown source={'Product thinker.\n\nInnovation researcher.\n\nBusiness experimenter.\n\n## The path\n\nVal_beta is an open space for exploring products, strategy, and better systems. Ideas are treated as experiments: versioned, tested, and allowed to change in public.\n\n## Collaboration\n\nIf you are researching, building, or redesigning a system, bring your loop. [Get in touch](mailto:hello@valbeta.fun).'} /></article>}

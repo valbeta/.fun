@@ -1,0 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
+const root=path.join(process.cwd(),"content");
+for(const type of ["ideas","explore","observe"]){const dir=path.join(root,type); if(!fs.existsSync(dir)) throw new Error(`Missing content directory: ${dir}`); for(const file of fs.readdirSync(dir).filter(f=>f.endsWith(".md"))){const source=fs.readFileSync(path.join(dir,file),"utf8"); const match=source.match(/^---\s*\n([\s\S]*?)\n---/); if(!match) throw new Error(`${type}/${file}: missing frontmatter`); const fields=new Map(match[1].split("\n").map(line=>{const i=line.indexOf(":"); return i<0?["",""]:[line.slice(0,i).trim(),line.slice(i+1).trim()];})); for(const field of ["title","description","date","status"]){if(!fields.get(field)) throw new Error(`${type}/${file}: missing ${field}`);} if(!/^\d{4}-\d{2}-\d{2}$/.test(fields.get("date")!)) throw new Error(`${type}/${file}: date must be YYYY-MM-DD`); if(!["draft","published"].includes(fields.get("status")!)) throw new Error(`${type}/${file}: status must be draft or published`); }}
+console.log("Content validation passed.");

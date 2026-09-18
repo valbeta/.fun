@@ -1,12 +1,15 @@
 {
   "name": "valbeta-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run validate:content && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "validate:content": "node scripts/validate-content.mjs",
+    "check": "npm run lint && npm run typecheck && npm run validate:content && npm run build"
   },
   "dependencies": {
     "next": "16.3.5",
