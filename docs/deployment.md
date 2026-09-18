@@ -39,6 +39,8 @@ The deploy workflow keeps the five newest release directories.
 
 Apply the headers in `deploy/nginx.conf.example` at the site server. Because this project uses `output: "export"`, Next.js cannot attach runtime headers itself after export.
 
+Keep `'unsafe-inline'` in `script-src`: Next.js static export writes inline Flight and hydration scripts into the generated HTML. Blocking them leaves the browser on the `app/loading.tsx` shell instead of replacing it with the rendered page.
+
 ## Local verification
 
 ```bash
