@@ -1,3 +1,4 @@
+// These types define the contract shared by the loader, routes, cards, and metadata.
 export type ContentType = "ideas" | "explore" | "observe";
 export type ContentStatus = "draft" | "published";
 

@@ -3,7 +3,7 @@ title: "The New Loop Theory"
 description: "Disruption is the moment a new causal loop starts compounding while the old loop decays."
 date: "2026-09-17"
 status: "published"
-tags: [innovation, strategy, systems]
+tags: [innovation, strategy, systems, "the new loop theory"]
 ---
 
 ## The working hypothesis

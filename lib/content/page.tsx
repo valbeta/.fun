@@ -26,6 +26,6 @@ export function makeGenerateMetadata(type: ContentType) {
     const { slug } = await params;
     const entry = getEntry(type, slug);
     if (!entry) return {};
-    return { title: entry.title, description: entry.description, alternates: { canonical: `/${type}/${slug}` }, openGraph: { title: entry.title, description: entry.description, type: "article", publishedTime: entry.date, section: labels[type], tags: entry.tags } };
+    return { title: entry.title, description: entry.description, keywords: entry.tags, alternates: { canonical: `/${type}/${slug}` }, openGraph: { title: entry.title, description: entry.description, type: "article", locale: "zh_CN", publishedTime: entry.date, section: labels[type], tags: entry.tags } };
   };
 }

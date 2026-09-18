@@ -9,12 +9,17 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "validate:content": "node scripts/validate-content.mjs",
-    "check": "npm run lint && npm run typecheck && npm run validate:content && npm run build"
+    "validate:export": "node scripts/validate-export.mjs",
+    "check": "npm run lint && npm run typecheck && npm run validate:content && npm run build && npm run validate:export"
   },
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "next": "16.3.5",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "rehype-pretty-code": "^0.14.5",
+    "shiki": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

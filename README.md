@@ -15,7 +15,7 @@ Quality checks and a production static export:
 npm run check
 ```
 
-The generated static site is written to `out/`. Content lives in `content/` and uses Markdown with YAML frontmatter. Add a file to `content/ideas`, `content/explore`, or `content/observe`, then run `npm run validate:content`.
+The generated static site is written to `out/`. Content lives in `content/` and uses MDX with YAML frontmatter. Existing `.md` files remain supported during migration; new content should use `.mdx`. Add a file to `content/ideas`, `content/explore`, or `content/observe`, then run `npm run validate:content`.
 
 ## Architecture
 

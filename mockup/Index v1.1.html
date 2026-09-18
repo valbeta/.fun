@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Val_beta — Building New Loops for Innovation</title>
+<meta name="description" content="Independent Innovation Lab. Exploring Product, Strategy and New Loop Theory. 一个关于创新、产品与未来商业系统的独立实验室。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   VALBETA — valbeta.fun
+   Design: Future Laboratory × Open Source Culture
+   Palette: GitHub Dark #0D1117 / Green #3FB950 / Orange #F0883E
+   ============================================================ */
+:root{
+  --bg:#0D1117;
+  --bg2:#161B22;
+  --bg3:#21262D;
+  --line:#30363D;
+  --line2:#21262D;
+  --text:#E6EDF3;
+  --body:#C9D1D9;
+  --muted:#8B949E;
+  --green:#3FB950;
+  --green-dim:rgba(63,185,80,.12);
+  --orange:#F0883E;
+  --orange-dim:rgba(240,136,62,.12);
+  --mono:'JetBrains Mono','Noto Sans SC',monospace;
+  --sans:'Inter','Noto Sans SC',-apple-system,sans-serif;
+  --r:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--body);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--green);color:#0D1117}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:2px}
+img,svg{display:block;max-width:100%}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:6px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--line)}
+
+/* ---------- layered background ---------- */
+.bg-grid,.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-grid{
+  background-image:
+    linear-gradient(rgba(139,148,158,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(139,148,158,.045) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 90% 80% at 50% 0%,#000 40%,transparent 100%);
+}
+.bg-glow{
+  background:
+    radial-gradient(700px 420px at 12% -6%,rgba(63,185,80,.09),transparent 65%),
+    radial-gradient(640px 420px at 92% 12%,rgba(240,136,62,.05),transparent 65%);
+}
+main,header,footer,.ticker{position:relative;z-index:1}
+
+.wrap{max-width:1200px;margin-inline:auto;padding-inline:28px}
+.mono{font-family:var(--mono)}
+
+/* ---------- reveal / motion primitives ---------- */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+.cursor{display:inline-block;margin-left:4px;color:var(--green);animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- version tag tooltip ---------- */
+.vtag{position:relative;cursor:default}
+.vtag::after{
+  content:attr(data-tip);
+  position:absolute;left:50%;bottom:calc(100% + 9px);
+  transform:translateX(-50%) translateY(5px);
+  background:var(--bg3);border:1px solid var(--line);color:var(--body);
+  font:500 10.5px/1 var(--mono);letter-spacing:.02em;
+  padding:7px 10px;border-radius:6px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:.22s ease;z-index:50;
+}
+.vtag::before{
+  content:"";position:absolute;left:50%;bottom:calc(100% + 4px);
+  transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--line);
+  opacity:0;transition:.22s ease;z-index:50;
+}
+.vtag:hover::after,.vtag:focus-visible::after,
+.vtag:hover::before,.vtag:focus-visible::before{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- status dots ---------- */
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);position:relative;display:inline-block;flex:none}
+.status-dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--green);animation:pulse 2.2s ease-out infinite}
+@keyframes pulse{from{transform:scale(.4);opacity:.8}to{transform:scale(1.5);opacity:0}}
+.st{display:inline-flex;align-items:center;gap:8px;font:600 10.5px/1 var(--mono);letter-spacing:.12em}
+.st i{width:8px;height:8px;border-radius:50%;flex:none}
+.st-b{color:var(--green)} .st-b i{background:var(--green);box-shadow:0 0 10px rgba(63,185,80,.8)}
+.st-r{color:var(--orange)} .st-r i{background:var(--orange);box-shadow:0 0 10px rgba(240,136,62,.7)}
+.st-a{color:var(--muted)} .st-a i{background:var(--muted)}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.hd{position:fixed;top:0;left:0;right:0;z-index:100;border-bottom:1px solid var(--line2);background:rgba(13,17,23,.86);backdrop-filter:blur(8px)}
+.hd-in{max-width:1200px;margin-inline:auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:32px}
+.brand{display:flex;flex-direction:column;line-height:1.15}
+.b-mark{font:700 15px var(--mono);letter-spacing:.14em;color:var(--text)}
+.b-mark .beta{color:var(--green);padding:0 2px}
+.b-dom{font:400 9.5px var(--mono);letter-spacing:.1em;color:var(--muted)}
+.hd-nav{display:flex;gap:26px;margin-left:auto}
+.hd-nav a{font:500 12px var(--mono);letter-spacing:.14em;color:var(--muted);padding:6px 0;position:relative;transition:color .2s}
+.hd-nav a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--green);transition:width .25s ease}
+.hd-nav a:hover,.hd-nav a.on{color:var(--text)}
+.hd-nav a.on::after,.hd-nav a:hover::after{width:100%}
+.hd-right{display:flex;align-items:center;gap:16px}
+.hd-ver{display:inline-flex;align-items:center;gap:8px;font:600 11px var(--mono);color:var(--green);border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:var(--green-dim)}
+.menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:6px;color:var(--text);font:600 11px var(--mono);padding:8px 12px;letter-spacing:.1em;cursor:pointer}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{padding:150px 0 64px;min-height:96vh;display:flex;flex-direction:column;justify-content:center}
+.hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:56px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font:600 11px var(--mono);letter-spacing:.24em;color:var(--green);border:1px solid var(--line);background:var(--bg2);padding:8px 14px;border-radius:999px;margin-bottom:28px}
+.hero-id{font:600 13px var(--mono);letter-spacing:.34em;color:var(--muted);margin-bottom:10px}
+.hero-id b{color:var(--orange);font-weight:600}
+.hero-h{font-family:var(--sans);font-weight:800;font-size:clamp(2.7rem,5.6vw,4.7rem);line-height:1.04;letter-spacing:-.03em;color:var(--text)}
+.hero-h em{font-style:normal;color:var(--green);position:relative}
+.hero-h em::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:2px;background:var(--green);opacity:.55}
+.hl{display:block;overflow:hidden;padding-bottom:.08em}
+.hl-in{display:block;transform:translateY(115%);transition:transform .95s cubic-bezier(.16,.84,.28,1)}
+.hero.loaded .hl:nth-child(1) .hl-in{transform:none;transition-delay:.1s}
+.hero.loaded .hl:nth-child(2) .hl-in{transform:none;transition-delay:.24s}
+.hero-cn{font-family:'Noto Sans SC',var(--sans);font-weight:500;font-size:15px;letter-spacing:.28em;color:var(--muted);margin:18px 0 22px}
+.hero-sub{max-width:480px;color:var(--muted);font-size:15px;line-height:1.85}
+.hero-sub b{color:var(--body);font-weight:600}
+.hero-sub .cn{display:block;font-size:13px;margin-top:6px;letter-spacing:.04em}
+.hero-cta{display:flex;gap:14px;margin:34px 0 30px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;font:600 12.5px var(--mono);letter-spacing:.1em;padding:15px 24px;border-radius:8px;transition:.25s ease;border:1px solid transparent}
+.btn .ar{transition:transform .25s ease}
+.btn:hover .ar{transform:translateX(4px)}
+.btn-p{background:var(--green);color:#0D1117}
+.btn-p:hover{background:#4CC763;box-shadow:0 8px 30px rgba(63,185,80,.28);transform:translateY(-2px)}
+.btn-s{border-color:var(--line);color:var(--body);background:var(--bg2)}
+.btn-s:hover{border-color:var(--green);color:var(--text);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:0;border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;width:max-content;background:rgba(22,27,34,.5)}
+.hero-stats span{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--muted);padding:10px 16px;border-right:1px solid var(--line2)}
+.hero-stats span:last-child{border-right:0}
+.hero-stats b{color:var(--text);font-weight:600}
+.hero-stats .hot{color:var(--orange)}
+
+/* --- hero visual frame --- */
+.hero-vis{position:relative;border:1px solid var(--line);border-radius:10px;background:rgba(22,27,34,.45);padding:14px}
+.hero-vis .tick{position:absolute;width:14px;height:14px;border-color:var(--green);border-style:solid;opacity:.85}
+.tick.tl{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.tick.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.hero-vis figcaption{display:flex;justify-content:space-between;align-items:center;font:500 10px var(--mono);letter-spacing:.18em;color:var(--muted);border-top:1px dashed var(--line);margin-top:12px;padding:12px 6px 2px}
+.hero-vis .live{color:var(--green);display:inline-flex;align-items:center;gap:8px}
+
+/* --- system map svg --- */
+.map{width:100%;height:auto}
+.orbit{fill:none;stroke:var(--line);stroke-dasharray:3 8}
+.orbits{transform-box:fill-box;transform-origin:center;animation:spin 90s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.edge{stroke:var(--line);stroke-width:1;stroke-dasharray:280;stroke-dashoffset:280;animation:draw 1.4s ease forwards}
+.edge:nth-child(2){animation-delay:.15s}.edge:nth-child(3){animation-delay:.3s}
+.edge:nth-child(4){animation-delay:.45s}.edge:nth-child(5){animation-delay:.6s}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chord{stroke:var(--line);stroke-width:1;stroke-dasharray:2 6;opacity:0;animation:fadein 1.2s ease forwards 1.5s}
+@keyframes fadein{to{opacity:.55}}
+.pulse-dot{fill:var(--green)}
+.pulse-dot.o{fill:var(--orange)}
+.hub-bg{fill:var(--bg2);stroke:var(--green);stroke-width:1.5}
+.hub-ring{fill:none;stroke:var(--line);stroke-dasharray:4 7;transform-box:fill-box;transform-origin:center;animation:spin 40s linear infinite reverse}
+.hub-t1{font:700 15px var(--mono);fill:var(--text);letter-spacing:.1em}
+.hub-t2{font:500 8px var(--mono);fill:var(--muted);letter-spacing:.22em}
+.node rect{fill:var(--bg2);stroke:var(--line);transition:stroke .3s}
+.node:hover rect{stroke:var(--green)}
+.node .n-name{font:600 10px var(--mono);fill:var(--text);letter-spacing:.06em}
+.node .n-sub{font:500 8px var(--mono);fill:var(--muted);letter-spacing:.1em}
+.node .n-dot{fill:var(--green)} .node .n-dot.o{fill:var(--orange)} .node .n-dot.g{fill:var(--muted)}
+.node{animation:float 6s ease-in-out infinite}
+.n2{animation-delay:.8s}.n3{animation-delay:1.6s}.n4{animation-delay:2.4s}.n5{animation-delay:3.2s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ---------- ticker ---------- */
+.ticker{overflow:hidden;border-block:1px solid var(--line2);background:rgba(22,27,34,.55)}
+.tk-track{display:flex;width:max-content;animation:tick 46s linear infinite}
+.ticker:hover .tk-track{animation-play-state:paused}
+@keyframes tick{to{transform:translateX(-50%)}}
+.tk-group{display:flex;align-items:center;gap:34px;padding:11px 17px}
+.tk-item{font:500 10.5px var(--mono);letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+.tk-item b{color:var(--green);font-weight:600}
+.tk-item .hl2{color:var(--orange)}
+.tk-sep{color:var(--line);font-family:var(--mono)}
+
+/* ============================================================
+   SECTIONS — shared
+   ============================================================ */
+.sec{padding:110px 0;border-top:1px solid var(--line2)}
+.sec-hd{margin-bottom:52px;position:relative}
+.sec-hd::before{content:"+";position:absolute;top:-26px;left:-4px;font:400 14px var(--mono);color:var(--line)}
+.sec-hd::after{content:"+";position:absolute;top:-26px;right:-4px;font:400 14px var(--mono);color:var(--line)}
+.sec-path{font:600 12px var(--mono);letter-spacing:.1em;color:var(--green);margin-bottom:14px}
+.sec-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.sec-row h2{font-weight:800;font-size:clamp(1.9rem,3.6vw,3rem);letter-spacing:-.025em;color:var(--text);line-height:1.1}
+.sec-cn{display:block;font-family:'Noto Sans SC',var(--sans);font-weight:500;font-size:13px;letter-spacing:.3em;color:var(--muted);margin-top:10px}
+.sec-meta{text-align:right;font:500 11px var(--mono);letter-spacing:.16em;color:var(--muted);display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.sec-meta .idx{color:var(--orange)}
+
+/* ============================================================
+   SEC.02 EXPERIMENTS
+   ============================================================ */
+.exp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.exp-card{position:relative;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:26px;display:flex;flex-direction:column;gap:16px;transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+.exp-card::before,.exp-card::after{content:"";position:absolute;width:16px;height:16px;border-color:var(--green);border-style:solid;opacity:0;transition:opacity .3s ease}
+.exp-card::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.exp-card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.exp-card:hover{transform:translateY(-4px);border-color:rgba(63,185,80,.55);box-shadow:0 16px 44px rgba(0,0,0,.4),0 0 0 1px rgba(63,185,80,.08)}
+.exp-card:hover::before,.exp-card:hover::after{opacity:1}
+.exp-top{display:flex;align-items:center;gap:10px;font:500 10px var(--mono);letter-spacing:.16em;color:var(--muted)}
+.exp-top .repo-ic{color:var(--muted)}
+.exp-top .vis{margin-left:auto;color:var(--muted);border:1px solid var(--line2);padding:3px 8px;border-radius:999px}
+.exp-name{font:700 20px/1.3 var(--sans);letter-spacing:-.01em;color:var(--text)}
+.exp-name .zh{display:block;font-family:'Noto Sans SC',var(--sans);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.14em;margin-top:5px}
+.exp-desc{font-size:14px;color:var(--muted);line-height:1.8;flex:1}
+.exp-tags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font:500 10px var(--mono);letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);padding:4px 10px;border-radius:999px;transition:.2s}
+.exp-card:hover .tag{border-color:var(--line)}
+.spark{display:flex;gap:3px;align-items:flex-end;height:32px;opacity:.9}
+.spark i{flex:1;background:rgba(63,185,80,.3);border-radius:1px;min-height:3px}
+.spark i.hot{background:var(--green)}
+.exp-foot{display:flex;align-items:center;gap:16px;border-top:1px dashed var(--line);padding-top:16px}
+.exp-foot .ver{font:600 11px var(--mono);color:var(--text);border:1px solid var(--line);background:var(--bg3);padding:5px 10px;border-radius:6px}
+.exp-foot .commits{font:500 10.5px var(--mono);color:var(--muted);margin-left:auto}
+.exp-link{font:600 11.5px var(--mono);letter-spacing:.1em;color:var(--green);display:inline-flex;gap:6px;align-items:center}
+.exp-link .ar{transition:transform .25s}
+.exp-card:hover .exp-link .ar{transform:translateX(4px)}
+
+/* ============================================================
+   SEC.03 FRAMEWORK LIBRARY
+   ============================================================ */
+.fw-wrap{display:grid;grid-template-columns:290px 1fr;gap:28px;align-items:start}
+.fw-index{position:sticky;top:96px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);overflow:hidden}
+.fw-ix-hd{font:600 11px var(--mono);letter-spacing:.14em;color:var(--muted);padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.fw-ix-hd b{color:var(--orange);font-weight:600}
+.fw-item{display:flex;align-items:center;gap:10px;font:500 12px var(--mono);color:var(--body);padding:14px 18px;border-bottom:1px solid var(--line2);transition:.2s;letter-spacing:.02em}
+.fw-item span{margin-left:auto;font-size:10.5px;color:var(--muted)}
+.fw-item:hover,.fw-item.is-on{background:var(--green-dim);color:var(--text)}
+.fw-item.is-on{box-shadow:inset 3px 0 0 var(--green)}
+.fw-note{padding:16px 18px;font-size:12px;line-height:1.8;color:var(--muted)}
+.fw-note b{display:inline-block;font:600 9.5px var(--mono);letter-spacing:.14em;color:var(--orange);border:1px solid rgba(240,136,62,.4);background:var(--orange-dim);padding:3px 8px;border-radius:4px;margin-bottom:8px}
+.readme{border:1px solid var(--line);border-radius:10px;background:var(--bg2);margin-bottom:28px;overflow:hidden;scroll-margin-top:100px}
+.readme-bar{display:flex;align-items:center;gap:14px;padding:12px 22px;border-bottom:1px solid var(--line);background:rgba(33,38,45,.5);font:500 11px var(--mono);color:var(--muted);letter-spacing:.06em}
+.readme-bar .file{color:var(--text);font-weight:600}
+.readme-bar .meta{margin-left:auto;letter-spacing:.1em;font-size:10px}
+.readme-bar .meta b{color:var(--green);font-weight:600}
+.readme-bd{padding:34px}
+.readme h3{font:800 clamp(1.5rem,2.4vw,2.1rem)/1.2 var(--sans);letter-spacing:-.02em;color:var(--text)}
+.readme .def{margin:14px 0 8px;font-size:15.5px;color:var(--body);max-width:640px}
+.readme .def-zh{font-family:'Noto Sans SC',var(--sans);font-size:13px;color:var(--muted);letter-spacing:.06em;margin-bottom:26px}
+.readme h4{font:600 12px var(--mono);letter-spacing:.2em;color:var(--green);margin:30px 0 16px}
+.readme h4::before{content:"## ";color:var(--line)}
+.readme ul.plain{list-style:none;display:grid;gap:8px;font-size:13.5px;color:var(--muted)}
+.readme ul.plain li::before{content:"— ";color:var(--green)}
+.readme-foot{display:flex;gap:18px;flex-wrap:wrap;align-items:center;border-top:1px dashed var(--line);margin-top:30px;padding-top:18px;font:500 10.5px var(--mono);letter-spacing:.1em;color:var(--muted)}
+.readme-foot .ver{color:var(--text);border:1px solid var(--line);padding:4px 9px;border-radius:6px;background:var(--bg3)}
+
+/* 4Q2I diagram */
+.q2i{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.q{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:22px;min-height:148px;transition:.25s ease;position:relative}
+.q:hover{border-color:var(--green);transform:translateY(-2px);background:rgba(63,185,80,.04)}
+.q-id{font:700 11px var(--mono);color:var(--orange);letter-spacing:.14em}
+.q b{display:block;font:700 16px var(--sans);letter-spacing:.02em;color:var(--text);margin:12px 0 6px}
+.q i{font-style:normal;font-family:'Noto Sans SC',var(--sans);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:132px;height:132px;border-radius:50%;background:var(--bg2);border:1.5px solid var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 0 40px rgba(63,185,80,.15);z-index:2}
+.q-core span{font:800 30px var(--sans);color:var(--green)}
+.q-core em{font:600 8.5px var(--mono);font-style:normal;letter-spacing:.18em;color:var(--muted);margin-top:4px;line-height:1.6}
+
+/* New Loop diagram */
+.loop-fig{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px}
+.loop-main{fill:none;stroke:var(--green);stroke-width:1.6;stroke-dasharray:10 7;animation:dashmove 26s linear infinite}
+@keyframes dashmove{to{stroke-dashoffset:-680}}
+.loop-old{fill:none;stroke:var(--muted);stroke-dasharray:3 7;opacity:.55}
+.lp-node{fill:var(--bg2);stroke:var(--green);stroke-width:1.4}
+.lp-node.hot{stroke:var(--orange)}
+.lp-t{font:600 9.5px var(--mono);fill:var(--text);letter-spacing:.12em}
+.lp-t.hot{fill:var(--orange)}
+.lp-s{font:500 8px var(--mono);fill:var(--muted);letter-spacing:.14em}
+.lp-old-t{font:600 9px var(--mono);fill:var(--muted);letter-spacing:.2em}
+
+/* ============================================================
+   SEC.04 RESEARCH LOG
+   ============================================================ */
+.log-grid{display:grid;grid-template-columns:1.35fr .85fr;gap:36px;align-items:start}
+.log{position:relative;padding-left:30px}
+.log::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.log-year{font:700 13px var(--mono);letter-spacing:.3em;color:var(--orange);margin:34px 0 14px;position:relative}
+.log-year::before{content:"";position:absolute;left:-28px;top:50%;width:9px;height:9px;background:var(--bg);border:2px solid var(--orange);transform:translateY(-50%) rotate(45deg)}
+.log-year:first-child{margin-top:0}
+.commit{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:start;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:12px;transition:.25s ease}
+.commit::before{content:"";position:absolute;left:-28px;top:26px;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--bg)}
+.commit:hover{border-color:rgba(63,185,80,.5);transform:translateX(4px)}
+.c-hash{font:600 12px var(--mono);color:var(--green);background:var(--green-dim);border:1px solid rgba(63,185,80,.25);padding:5px 9px;border-radius:6px;white-space:nowrap}
+.c-msg{font-weight:600;font-size:14.5px;color:var(--text)}
+.c-msg b{color:var(--green);font-weight:600}
+.c-detail{font:500 11.5px var(--mono);color:var(--muted);margin-top:6px;letter-spacing:.02em}
+.c-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.chip{font:600 10.5px var(--mono);letter-spacing:.08em;padding:5px 10px;border-radius:6px;border:1px solid}
+.chip-g{color:var(--green);border-color:rgba(63,185,80,.4);background:var(--green-dim)}
+.chip-o{color:var(--orange);border-color:rgba(240,136,62,.45);background:var(--orange-dim)}
+.chip-n{color:var(--muted);border-color:var(--line);background:var(--bg3)}
+.c-side time{font:500 10.5px var(--mono);color:var(--muted);letter-spacing:.1em}
+.log-aside{position:sticky;top:96px;display:grid;gap:20px}
+.panel{border:1px solid var(--line);border-radius:10px;background:var(--bg2);padding:22px}
+.panel-hd{font:600 10.5px var(--mono);letter-spacing:.2em;color:var(--muted);margin-bottom:16px;display:flex;justify-content:space-between}
+.panel-hd b{color:var(--green);font-weight:600}
+#contrib{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;overflow:hidden}
+.cc{width:11px;border-radius:2px;transition:transform .15s}
+.cc:hover{transform:scale(1.35);outline:1px solid var(--green)}
+.legend{display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:12px;font:500 9.5px var(--mono);color:var(--muted)}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.stat-rows{display:grid;gap:0}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line);font:500 11px var(--mono);letter-spacing:.12em;color:var(--muted)}
+.stat-row:last-child{border-bottom:0}
+.stat-row b{color:var(--text);font-size:15px;font-weight:700}
+.stat-row b.g{color:var(--green)} .stat-row b.o{color:var(--orange)}
+.panel .fnote{font-size:11px;color:var(--muted);margin-top:12px;font-family:var(--mono);letter-spacing:.02em}
+
+/* ============================================================
+   SEC.05 ABOUT
+   ============================================================ */
+.about-l1{display:grid;gap:6px;margin-bottom:20px}
+.about-l1 .line{font:800 clamp(1.7rem,3.4vw,2.9rem)/1.15 var(--sans);letter-spacing:-.02em;color:var(--text)}
+.about-l1 .line:nth-child(2){color:var(--muted)}
+.about-l1 .line:nth-child(3){color:var(--green)}
+.about-l1-cn{font-family:'Noto Sans SC',var(--sans);font-size:13px;letter-spacing:.34em;color:var(--muted);margin-bottom:56px}
+.path{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg2);margin-bottom:64px}
+.path-step{padding:26px 24px;border-right:1px solid var(--line);position:relative;transition:.25s}
+.path-step:last-child{border-right:0}
+.path-step:hover{background:rgba(63,185,80,.05)}
+.path-step::after{content:"→";position:absolute;right:-7px;top:50%;transform:translateY(-50%);font:600 14px var(--mono);color:var(--green);z-index:2;background:var(--bg);border:1px solid var(--line);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.path-step:last-child::after{display:none}
+.ps-ix{font:600 10px var(--mono);letter-spacing:.2em;color:var(--orange)}
+.ps-role{font:700 15px var(--sans);color:var(--text);margin:12px 0 4px;letter-spacing:.01em}
+.ps-zh{font-family:'Noto Sans SC',var(--sans);font-size:11px;color:var(--muted);letter-spacing:.2em;margin-bottom:10px}
+.ps-note{font-size:12px;color:var(--muted);line-height:1.7}
+.path-step.now{background:var(--green-dim);box-shadow:inset 0 2px 0 var(--green)}
+.path-step.now .ps-ix{color:var(--green)}
+.belief{border-left:3px solid var(--green);background:var(--bg2);border-radius:0 10px 10px 0;padding:44px 48px;position:relative}
+.belief::before{content:"“";position:absolute;top:-8px;left:26px;font:800 80px var(--sans);color:var(--green);opacity:.35;line-height:1}
+.belief p{font:700 clamp(1.3rem,2.4vw,1.9rem)/1.5 var(--sans);letter-spacing:-.01em;color:var(--text);max-width:760px}
+.belief p em{font-style:normal;color:var(--green);border-bottom:2px solid rgba(63,185,80,.5)}
+.belief .zh{font-family:'Noto Sans SC',var(--sans);font-size:14px;color:var(--muted);letter-spacing:.1em;margin-top:18px}
+.belief .sig{font:600 11px var(--mono);letter-spacing:.2em;color:var(--orange);margin-top:24px}
+
+/* ============================================================
+   SEC.06 CONNECT
+   ============================================================ */
+.cn-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:start}
+.cn-lead{font-size:16px;color:var(--body);max-width:480px;line-height:1.9;margin-bottom:34px}
+.cn-lead .zh{display:block;font-family:'Noto Sans SC',var(--sans);font-size:13px;color:var(--muted);margin-top:8px;letter-spacing:.05em}
+.cn-for{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cn-for li{list-style:none;border:1px solid var(--line);background:var(--bg2);border-radius:8px;padding:18px 20px;transition:.25s}
+.cn-for li:hover{border-color:var(--green);transform:translateY(-3px)}
+.cn-for b{display:block;font:700 14px var(--sans);color:var(--text)}
+.cn-for span{font-family:'Noto Sans SC',var(--sans);font-size:11.5px;color:var(--muted);letter-spacing:.24em}
+.cn-for .ix{font:600 9.5px var(--mono);color:var(--orange);letter-spacing:.2em;display:block;margin-bottom:8px}
+.term{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0A0E14;margin-bottom:16px}
+.term-bar{display:flex;align-items:center;gap:7px;padding:11px 16px;border-bottom:1px solid var(--line);background:var(--bg2)}
+.term-bar i{width:10px;height:10px;border-radius:50%;background:var(--bg3);border:1px solid var(--line)}
+.term-bar span{margin-left:auto;font:500 10.5px var(--mono);color:var(--muted);letter-spacing:.08em}
+.term-body{padding:20px;font:500 12.5px/2 var(--mono)}
+.t-p{color:var(--green)}
+.t-out{color:var(--muted)}
+.t-out b{color:var(--orange);font-weight:600}
+.cn-btn{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--line);background:var(--bg2);border-radius:8px;padding:18px 22px;margin-bottom:10px;font:700 13px var(--mono);letter-spacing:.16em;color:var(--text);transition:.25s}
+.cn-btn span{font:500 11px var(--mono);letter-spacing:.04em;color:var(--muted);transition:.25s}
+.cn-btn:hover{border-color:var(--green);transform:translateX(5px);background:var(--green-dim)}
+.cn-btn:hover span{color:var(--green)}
+.cn-note{font:500 11px var(--mono);color:var(--muted);letter-spacing:.04em;margin-top:18px}
+.cn-note b{color:var(--green)}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.ft{border-top:1px solid var(--line2);padding:80px 0 34px;background:rgba(22,27,34,.35)}
+.ft-top{display:flex;justify-content:space-between;gap:40px;align-items:flex-end;flex-wrap:wrap;margin-bottom:60px}
+.ft-mark{font:800 clamp(3rem,8vw,6.4rem)/1 var(--sans);letter-spacing:-.03em;color:transparent;-webkit-text-stroke:1px var(--line);user-select:none}
+.ft-mark span{-webkit-text-stroke:0;color:var(--green)}
+.ft-creed{font:600 14px var(--mono);color:var(--body);letter-spacing:.02em;text-align:right;line-height:2}
+.ft-creed span{display:block;font-family:'Noto Sans SC',var(--sans);font-weight:400;font-size:12px;color:var(--muted);letter-spacing:.12em}
+.ft-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;border-top:1px solid var(--line2);padding-top:44px;margin-bottom:56px}
+.ft-col h5{font:600 10px var(--mono);letter-spacing:.26em;color:var(--muted);margin-bottom:18px}
+.ft-col a,.ft-col p{display:block;font-size:13.5px;color:var(--body);padding:5px 0;transition:.2s}
+.ft-col a:hover{color:var(--green);transform:translateX(4px)}
+.ft-col .dim{color:var(--muted);font-size:12.5px}
+.ft-bar{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line2);padding-top:24px;font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--muted);align-items:center}
+.ft-bar .run{display:inline-flex;align-items:center;gap:9px;color:var(--green)}
+.ft-build{border:1px solid var(--line);padding:5px 10px;border-radius:6px;color:var(--text)}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1020px){
+  .hero-grid,.cn-grid,.log-grid{grid-template-columns:1fr}
+  .hero{padding-top:120px;min-height:auto}
+  .fw-wrap{grid-template-columns:1fr}
+  .fw-index{position:static}
+  .log-aside{position:static}
+  .path{grid-template-columns:1fr 1fr}
+  .path-step:nth-child(2)::after{display:none}
+  .path-step{border-bottom:1px solid var(--line)}
+}
+@media (max-width:860px){
+  .hd-nav{position:fixed;top:64px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--line);flex-direction:column;gap:0;padding:14px 28px 22px;display:none}
+  .hd-nav a{padding:13px 0;border-bottom:1px solid var(--line2)}
+  body.nav-open .hd-nav{display:flex}
+  .menu-btn{display:block}
+  .hd-right .hd-ver{display:none}
+}
+@media (max-width:680px){
+  .exp-grid,.cn-for,.q2i{grid-template-columns:1fr}
+  .path{grid-template-columns:1fr}
+  .path-step::after{display:none}
+  .ft-cols{grid-template-columns:1fr}
+  .commit{grid-template-columns:1fr}
+  .c-side{flex-direction:row;align-items:center}
+  .belief{padding:36px 26px}
+  .sec{padding:80px 0}
+  .q-core{width:104px;height:104px}
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  .rv{opacity:1;transform:none}
+  .hl-in{transform:none}
+  .edge{stroke-dashoffset:0;animation:none}
+  .chord{opacity:.55;animation:none}
+  .tk-track{animation:none}
+  .orbits,.hub-ring{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="hd" id="top">
+  <div class="hd-in">
+    <a class="brand" href="#top" aria-label="Valbeta home">
+      <span class="b-mark">VAL<span class="beta">β</span>BETA</span>
+      <span class="b-dom">valbeta.fun</span>
+    </a>
+    <nav class="hd-nav" id="hdNav" aria-label="Main navigation">
+      <a href="#experiments">EXPERIMENTS</a>
+      <a href="#frameworks">FRAMEWORKS</a>
+      <a href="#log">NOTES</a>
+      <a href="#about">ABOUT</a>
+    </nav>
+    <div class="hd-right">
+      <span class="hd-ver vtag" data-tip="last deploy · 17 Sep 2026" tabindex="0"><span class="status-dot"></span>v0.7</span>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="hdNav">MENU</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= SEC.01 HERO ================= -->
+<section class="hero" id="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="status-dot"></span>INDEPENDENT INNOVATION LAB · EST. 2024</span>
+      <p class="hero-id decode" data-text="VAL_BETA // IDEAS ARE NEVER FINISHED">VAL_BETA // IDEAS ARE NEVER FINISHED</p>
+      <h1 class="hero-h">
+        <span class="hl"><span class="hl-in">Building <em>New Loops</em></span></span>
+        <span class="hl"><span class="hl-in">for Innovation.</span></span>
+      </h1>
+      <p class="hero-cn">探索创新的新回路。</p>
+      <p class="hero-sub">
+        <b>Exploring Product, Strategy and The New Loop Theory.</b>
+        An independent laboratory where ideas ship as betas — and evolve in public.
+        <span class="cn">一个关于创新、产品与未来商业系统的独立实验室。</span>
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-p" href="#experiments">EXPLORE EXPERIMENTS <span class="ar">→</span></a>
+        <a class="btn btn-s" href="#log">READ RESEARCH NOTES</a>
+      </div>
+      <div class="hero-stats mono">
+        <span><b>04</b> EXPERIMENTS</span>
+        <span><b>02</b> FRAMEWORKS</span>
+        <span><b>132</b> COMMITS</span>
+        <span class="hot">STATUS: BUILDING</span>
+      </div>
+    </div>
+
+    <figure class="hero-vis rv" style="--d:.3s">
+      <i class="tick tl"></i><i class="tick br"></i>
+      <svg class="map" viewBox="0 0 600 620" role="img" aria-label="Innovation System Map — Val_Beta at the center, connected to The New Loop Theory, 4Q2I Innovation Framework, AI-Augmented Product, Systematic Product Thinking and Gamification">
+        <g class="orbits">
+          <circle class="orbit" cx="300" cy="310" r="150"/>
+          <circle class="orbit" cx="300" cy="310" r="238"/>
+        </g>
+        <!-- chords (network) -->
+        <line class="chord" x1="300" y1="115" x2="477" y2="207"/>
+        <line class="chord" x1="477" y1="207" x2="477" y2="412"/>
+        <line class="chord" x1="477" y1="412" x2="127" y2="412"/>
+        <line class="chord" x1="127" y1="412" x2="127" y2="207"/>
+        <line class="chord" x1="127" y1="207" x2="300" y2="115"/>
+        <!-- spokes -->
+        <g>
+          <line class="edge" x1="300" y1="310" x2="300" y2="115"/>
+          <line class="edge" x1="300" y1="310" x2="477" y2="207"/>
+          <line class="edge" x1="300" y1="310" x2="477" y2="412"/>
+          <line class="edge" x1="300" y1="310" x2="127" y2="412"/>
+          <line class="edge" x1="300" y1="310" x2="127" y2="207"/>
+        </g>
+        <!-- signal pulses -->
+        <circle class="pulse-dot" r="3.5"><animateMotion dur="4.5s" repeatCount="indefinite" path="M300,310 L300,115"/></circle>
+        <circle class="pulse-dot" r="3.5"><animateMotion dur="6s" begin="1.2s" repeatCount="indefinite" path="M300,310 L477,412"/></circle>
+        <circle class="pulse-dot o" r="3.5"><animateMotion dur="7s" begin="2.4s" repeatCount="indefinite" path="M300,310 L127,207"/></circle>
+        <!-- hub -->
+        <g class="hub">
+          <circle class="hub-ring" cx="300" cy="310" r="72"/>
+          <circle class="hub-bg" cx="300" cy="310" r="56"/>
+          <text class="hub-t1" x="300" y="306" text-anchor="middle">VALBETA</text>
+          <text class="hub-t2" x="300" y="326" text-anchor="middle">INNOVATION OS</text>
+        </g>
+        <!-- nodes -->
+        <g class="node n1">
+          <rect x="212" y="97" width="176" height="38" rx="7"/>
+          <circle class="n-dot" cx="228" cy="116" r="3.5"/>
+          <text class="n-name" x="240" y="112">THE NEW LOOP THEORY</text>
+          <text class="n-sub" x="240" y="126">v0.7 · THEORY</text>
+        </g>
+        <g class="node n2">
+          <rect x="402" y="188" width="168" height="38" rx="7"/>
+          <circle class="n-dot" cx="418" cy="207" r="3.5"/>
+          <text class="n-name" x="430" y="203">4Q2I INNOVATION FRAMEWORK</text>
+          <text class="n-sub" x="430" y="217">v1.2 · FRAMEWORK</text>
+        </g>
+        <g class="node n3">
+          <rect x="392" y="393" width="186" height="38" rx="7"/>
+          <circle class="n-dot o" cx="408" cy="412" r="3.5"/>
+          <text class="n-name" x="420" y="408">AI-AUGMENTED PRODUCT</text>
+          <text class="n-sub" x="420" y="422">v0.3 · RESEARCHING</text>
+        </g>
+        <g class="node n4">
+          <rect x="42" y="393" width="172" height="38" rx="7"/>
+          <circle class="n-dot" cx="58" cy="412" r="3.5"/>
+          <text class="n-name" x="70" y="408">SYSTEMATIC PRODUCT THINKING</text>
+          <text class="n-sub" x="70" y="422">ESSAYS · ONGOING</text>
+        </g>
+        <g class="node n5">
+          <rect x="48" y="188" width="158" height="38" rx="7"/>
+          <circle class="n-dot g" cx="64" cy="207" r="3.5"/>
+          <text class="n-name" x="76" y="203">GAMIFICATION</text>
+          <text class="n-sub" x="76" y="217">v0.9 · ARCHIVED</text>
+        </g>
+      </svg>
+      <figcaption>
+        <span>FIG.01 — INNOVATION SYSTEM MAP</span>
+        <span class="live"><span class="status-dot"></span>LIVE</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= TICKER ================= -->
+<div class="ticker" aria-hidden="true">
+  <div class="tk-track">
+    <div class="tk-group">
+      <span class="tk-item"><b>a3f9c2e</b> · new-loop-theory: redefine old-loop decay</span><span class="tk-sep">//</span>
+      <span class="tk-item"><b>7d21b4a</b> · 4q2i: add consumer-ai case study</span><span class="tk-sep">//</span>
+      <span class="tk-item"><b>c58e0f1</b> · ai-pm: field notes vol.3</span><span class="tk-sep">//</span>
+      <span class="tk-item"><span class="hl2">release</span> · 4q2i framework v2.0 is public</span><span class="tk-sep">//</span>
+      <span class="tk-item">status: <b>2 building</b> · <span class="hl2">1 researching</span> · 1 archived</span><span class="tk-sep">//</span>
+      <span class="tk-item">next → the new loop theory <b>v0.8</b> public draft</span><span class="tk-sep">//</span>
+    </div>
+    <div class="tk-group">
+      <span class="tk-item"><b>a3f9c2e</b> · new-loop-theory: redefine old-loop decay</span><span class="tk-sep">//</span>
+      <span class="tk-item"><b>7d21b4a</b> · 4q2i: add consumer-ai case study</span><span class="tk-sep">//</span>
+      <span class="tk-item"><b>c58e0f1</b> · ai-pm: field notes vol.3</span><span class="tk-sep">//</span>
+      <span class="tk-item"><span class="hl2">release</span> · 4q2i framework v2.0 is public</span><span class="tk-sep">//</span>
+      <span class="tk-item">status: <b>2 building</b> · <span class="hl2">1 researching</span> · 1 archived</span><span class="tk-sep">//</span>
+      <span class="tk-item">next → the new loop theory <b>v0.8</b> public draft</span><span class="tk-sep">//</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SEC.02 EXPERIMENTS ================= -->
+<section class="sec" id="experiments">
+  <div class="wrap">
+    <header class="sec-hd rv">
+      <div class="sec-path"><span class="decode" data-text="~/valbeta/experiments">~/valbeta/experiments</span><span class="cursor">▍</span></div>
+      <div class="sec-row">
+        <h2>Experiments<span class="sec-cn">进行中的思想实验</span></h2>
+        <div class="sec-meta"><span class="idx">SEC.02</span><span>IDEAS CURRENTLY UNDER CONSTRUCTION.</span></div>
+      </div>
+    </header>
+
+    <div class="exp-grid">
+      <!-- EXP-001 -->
+      <article class="exp-card rv">
+        <div class="exp-top"><span class="repo-ic">▣</span> EXP-001 / NEW-LOOP-THEORY <span class="vis">PUBLIC</span></div>
+        <h3 class="exp-name">The New Loop Theory<span class="zh">降维创新理论</span></h3>
+        <p class="exp-desc">Disruptive innovation reconstructed as new causal loop creation. 把颠覆式创新，重构为「新因果回路」的创建过程。</p>
+        <div class="exp-tags"><span class="tag">Innovation Theory</span><span class="tag">Strategy</span><span class="tag">Research</span></div>
+        <div class="spark" data-seed="11" aria-hidden="true"></div>
+        <div class="exp-foot">
+          <span class="st st-b"><i></i>EXPERIMENTING</span>
+          <span class="ver vtag" data-tip="last updated 17 Sep 2026" tabindex="0">v0.7</span>
+          <span class="commits">128 commits</span>
+          <a class="exp-link" href="#fw-loop">EXPLORE <span class="ar">→</span></a>
+        </div>
+      </article>
+      <!-- EXP-002 -->
+      <article class="exp-card rv" style="--d:.1s">
+        <div class="exp-top"><span class="repo-ic">▣</span> EXP-002 / INNOVATION-4Q2I <span class="vis">PUBLIC</span></div>
+        <h3 class="exp-name">Innovation 4Q2I<span class="zh">创新四问模型框架</span></h3>
+        <p class="exp-desc">Four questions that separate signal from noise before building anything. 在动手之前，用四个问题过滤噪音。</p>
+        <div class="exp-tags"><span class="tag">Product Innovation</span><span class="tag">Framework</span><span class="tag">Methodology</span></div>
+        <div class="spark" data-seed="42" aria-hidden="true"></div>
+        <div class="exp-foot">
+          <span class="st st-b"><i></i>BUILDING</span>
+          <span class="ver vtag" data-tip="last updated 02 Jul 2026" tabindex="0">v1.2</span>
+          <span class="commits">96 commits</span>
+          <a class="exp-link" href="#fw-4q2i">EXPLORE <span class="ar">→</span></a>
+        </div>
+      </article>
+      <!-- EXP-003 -->
+      <article class="exp-card rv" style="--d:.2s">
+        <div class="exp-top"><span class="repo-ic">▣</span> EXP-003 / AI-AUGMENTED-PM <span class="vis">PUBLIC</span></div>
+        <h3 class="exp-name">AI-Augmented Product Management<span class="zh">AI 增强的产品管理</span></h3>
+        <p class="exp-desc">How AI reshapes the PM role — from feature shipping to loop designing. 当 AI 重写工作流，产品经理的新职责是设计回路。</p>
+        <div class="exp-tags"><span class="tag">AI</span><span class="tag">Product Management</span><span class="tag">Field Research</span></div>
+        <div class="spark" data-seed="77" aria-hidden="true"></div>
+        <div class="exp-foot">
+          <span class="st st-r"><i></i>RESEARCHING</span>
+          <span class="ver vtag" data-tip="last updated 14 Mar 2026" tabindex="0">v0.3</span>
+          <span class="commits">31 commits</span>
+          <a class="exp-link" href="#log">EXPLORE <span class="ar">→</span></a>
+        </div>
+      </article>
+      <!-- EXP-004 -->
+      <article class="exp-card rv" style="--d:.3s">
+        <div class="exp-top"><span class="repo-ic">▣</span> EXP-004 / GAMIFICATION <span class="vis">PUBLIC</span></div>
+        <h3 class="exp-name">Gamification Research<span class="zh">游戏化机制研究</span></h3>
+        <p class="exp-desc">Motivation systems beyond points: loops, identity and meaning. 积分之外的动机系统：回路、身份与意义。</p>
+        <div class="exp-tags"><span class="tag">Gamification</span><span class="tag">Behavior</span><span class="tag">Motivation</span></div>
+        <div class="spark" data-seed="29" aria-hidden="true"></div>
+        <div class="exp-foot">
+          <span class="st st-a"><i></i>ARCHIVED</span>
+          <span class="ver vtag" data-tip="last updated 08 Jun 2025" tabindex="0">v0.9</span>
+          <span class="commits">74 commits</span>
+          <a class="exp-link" href="#log">EXPLORE <span class="ar">→</span></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SEC.03 FRAMEWORKS ================= -->
+<section class="sec" id="frameworks">
+  <div class="wrap">
+    <header class="sec-hd rv">
+      <div class="sec-path"><span class="decode" data-text="~/valbeta/frameworks">~/valbeta/frameworks</span><span class="cursor">▍</span></div>
+      <div class="sec-row">
+        <h2>Framework Library<span class="sec-cn">思想资产库</span></h2>
+        <div class="sec-meta"><span class="idx">SEC.03</span><span>PUBLIC LAYER · OPEN THINKING</span></div>
+      </div>
+    </header>
+
+    <div class="fw-wrap">
+      <aside class="fw-index rv">
+        <div class="fw-ix-hd">LIBRARY.md <b>02 FILES</b></div>
+        <a class="fw-item is-on" href="#fw-4q2i">[01] 4Q2I <span>v1.2</span></a>
+        <a class="fw-item" href="#fw-loop">[02] THE NEW LOOP THEORY <span>v0.7</span></a>
+        <div class="fw-note">
+          <b>PUBLIC LAYER / 公开层</b><br>
+          这里只公开思想资产，不包含商业交付细节。Frameworks here are thinking assets — delivery details live elsewhere.
+        </div>
+      </aside>
+
+      <div class="fw-body">
+        <!-- 4Q2I -->
+        <article class="readme rv" id="fw-4q2i">
+          <div class="readme-bar"><span class="file">README.md</span><span>4q2i/</span><span class="meta">VISIBILITY: <b>PUBLIC</b> · LICENSE: OPEN THINKING</span></div>
+          <div class="readme-bd">
+            <h3>4Q2I — Four Questions to Meaningful Innovation</h3>
+            <p class="def">A filter, not a funnel: four questions every idea must survive before it earns the right to be built — and one integration that turns answers into innovation.</p>
+            <p class="def-zh">四个问题，筛出值得构建的创新；一次整合，把答案变成系统。</p>
+            <div class="q2i">
+              <div class="q"><span class="q-id">Q1 / 可知</span><b>Where do we stand?</b><i>认知与证据 · Can we know?</i></div>
+              <div class="q"><span class="q-id">Q2 / 可想</span><b>Where are we going?</b><i>想象与可能 · Can we imagine?</i></div>
+              <div class="q"><span class="q-id">Q3 / 可赞</span><b>Who is with us - and why?</b><i>采纳与分歧 · Can we gain adoption?</i></div>
+              <div class="q"><span class="q-id">Q4 / 可行</span><b>How do we get there?</b><i>执行与系统 · Can we execute?</i></div>
+              <div class="q-core"><span>I</span><em>MEANINGFUL<br>INNOVATION<br>有意义的创新</em></div>
+            </div>
+            <h4>STATUS</h4>
+            <ul class="plain">
+              <li>Version 1.2 — stable, used in workshops &amp; advisory</li>
+              <li>Case studies: consumer AI, enterprise SaaS, new retail</li>
+              <li>Next: v1.3 adds an AI-augmented questioning layer</li>
+            </ul>
+            <div class="readme-foot">
+              <span class="ver vtag" data-tip="released 20 Nov 2025" tabindex="0">v1.2</span>
+              <span class="st st-b"><i></i>BUILDING</span>
+              <span>LAST UPDATED · 02 JUL 2026</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- THE NEW LOOP THEORY -->
+        <article class="readme rv" id="fw-loop">
+          <div class="readme-bar"><span class="file">README.md</span><span>new-loop-theory/</span><span class="meta">VISIBILITY: <b>PUBLIC</b> · LICENSE: OPEN THINKING</span></div>
+          <div class="readme-bd">
+            <h3>The New Loop Theory</h3>
+            <p class="def">Disruption is not a product event — it is the moment a new causal loop starts compounding while the old loop decays. Innovation = loop design.</p>
+            <p class="def-zh">颠覆不是产品事件，而是「新回路开始复利、旧回路开始衰减」的那个时刻。创新即回路设计。</p>
+            <div class="loop-fig">
+              <svg viewBox="0 0 380 300" role="img" aria-label="New Loop diagram: insight, new loop, adoption and compounding form a reinforcing cycle while the old loop decays">
+                <circle class="loop-main" cx="190" cy="150" r="100"/>
+                <circle class="loop-old" cx="190" cy="150" r="46"/>
+                <text class="lp-old-t" x="190" y="146" text-anchor="middle">OLD LOOP</text>
+                <text class="lp-old-t" x="190" y="162" text-anchor="middle">DECAYS ↓</text>
+                <circle class="lp-node" cx="190" cy="50" r="7"/>
+                <text class="lp-t" x="190" y="30" text-anchor="middle">INSIGHT</text>
+                <text class="lp-s" x="190" y="42" text-anchor="middle">洞察</text>
+                <circle class="lp-node hot" cx="290" cy="150" r="7"/>
+                <text class="lp-t hot" x="290" y="130" text-anchor="middle">NEW LOOP</text>
+                <text class="lp-s" x="290" y="142" text-anchor="middle">新回路</text>
+                <circle class="lp-node" cx="190" cy="250" r="7"/>
+                <text class="lp-t" x="190" y="272" text-anchor="middle">ADOPTION</text>
+                <text class="lp-s" x="190" y="284" text-anchor="middle">采纳</text>
+                <circle class="lp-node" cx="90" cy="150" r="7"/>
+                <text class="lp-t" x="90" y="130" text-anchor="middle">COMPOUNDING</text>
+                <text class="lp-s" x="90" y="142" text-anchor="middle">增强</text>
+              </svg>
+            </div>
+            <h4>STATUS</h4>
+            <ul class="plain">
+              <li>Version 0.7 — core causal model drafted, being stress-tested</li>
+              <li>v0.8 will redefine “old-loop decay” (in progress)</li>
+              <li>Open question: how to measure loop velocity early?</li>
+            </ul>
+            <div class="readme-foot">
+              <span class="ver vtag" data-tip="last updated 17 Sep 2026" tabindex="0">v0.7</span>
+              <span class="st st-b"><i></i>EXPERIMENTING</span>
+              <span>LAST UPDATED · 17 SEP 2026</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SEC.04 RESEARCH LOG ================= -->
+<section class="sec" id="log">
+  <div class="wrap">
+    <header class="sec-hd rv">
+      <div class="sec-path"><span class="decode" data-text="~/valbeta/notes --log">~/valbeta/notes --log</span><span class="cursor">▍</span></div>
+      <div class="sec-row">
+        <h2>Research Log<span class="sec-cn">研究日志 · 持续更新</span></h2>
+        <div class="sec-meta"><span class="idx">SEC.04</span><span>COMMITS, NOT POSTS.</span></div>
+      </div>
+    </header>
+
+    <div class="log-grid">
+      <div class="log">
+        <div class="log-year rv">2026</div>
+        <div class="commit rv">
+          <span class="c-hash">a3f9c2e</span>
+          <div class="c-main">
+            <p class="c-msg">Updated: <b>The New Loop Theory</b></p>
+            <p class="c-detail">Changed: definition of old-loop decay · 重写「旧回路衰减」的定义</p>
+          </div>
+          <div class="c-side"><span class="chip chip-g">v0.8</span><time>09.17</time></div>
+        </div>
+        <div class="commit rv">
+          <span class="c-hash">7d21b4a</span>
+          <div class="c-main">
+            <p class="c-msg">Added: <b>4Q2I case study</b></p>
+            <p class="c-detail">Consumer AI product — all four questions answered “yes”, shipped in 9 weeks</p>
+          </div>
+          <div class="c-side"><span class="chip chip-g">v1.2</span><time>07.02</time></div>
+        </div>
+        <div class="commit rv">
+          <span class="c-hash">c58e0f1</span>
+          <div class="c-main">
+            <p class="c-msg">Started: <b>AI-Augmented PM field notes</b></p>
+            <p class="c-detail">Interviews with 12 product managers · 访谈 12 位产品经理</p>
+          </div>
+          <div class="c-side"><span class="chip chip-o">v0.3</span><time>03.14</time></div>
+        </div>
+
+        <div class="log-year rv">2025</div>
+        <div class="commit rv">
+          <span class="c-hash">f04a9d3</span>
+          <div class="c-main">
+            <p class="c-msg">Released: <b>4Q2I Framework</b> — first public draft</p>
+            <p class="c-detail">从内部方法到公开思想资产 · from private method to public asset</p>
+          </div>
+          <div class="c-side"><span class="chip chip-o">RELEASE</span><time>11.20</time></div>
+        </div>
+        <div class="commit rv">
+          <span class="c-hash">91b7e62</span>
+          <div class="c-main">
+            <p class="c-msg">Archived: <b>Gamification Research</b></p>
+            <p class="c-detail">Conclusions folded into loop theory · 结论并入回路理论</p>
+          </div>
+          <div class="c-side"><span class="chip chip-n">v0.9 · ARCHIVED</span><time>06.08</time></div>
+        </div>
+
+        <div class="log-year rv">2024</div>
+        <div class="commit rv">
+          <span class="c-hash">4c8d1b7</span>
+          <div class="c-main">
+            <p class="c-msg">Started: <b>AI Product Research</b></p>
+            <p class="c-detail">First hypothesis: AI changes loops, not features</p>
+          </div>
+          <div class="c-side"><span class="chip chip-n">v0.1</span><time>10.01</time></div>
+        </div>
+        <div class="commit rv">
+          <span class="c-hash">0000001</span>
+          <div class="c-main">
+            <p class="c-msg">init: <b>valbeta.fun</b> — first commit</p>
+            <p class="c-detail">“Ideas are never finished. They evolve through experiments.”</p>
+          </div>
+          <div class="c-side"><span class="chip chip-g">GENESIS</span><time>05.12</time></div>
+        </div>
+      </div>
+
+      <aside class="log-aside">
+        <div class="panel rv">
+          <div class="panel-hd">EXPERIMENT ACTIVITY <b>32 WEEKS</b></div>
+          <div id="contrib" aria-label="Contribution graph of experiment activity"></div>
+          <div class="legend">LESS <i style="background:#161B22"></i><i style="background:#0E4429"></i><i style="background:#006D32"></i><i style="background:#26A641"></i><i style="background:#3FB950"></i> MORE</div>
+          <p class="fnote">// every square = one small experiment · 每一格都是一次小实验</p>
+        </div>
+        <div class="panel rv" style="--d:.15s">
+          <div class="panel-hd">LAB TOTALS</div>
+          <div class="stat-rows">
+            <div class="stat-row">COMMITS <b>132</b></div>
+            <div class="stat-row">RELEASES <b class="o">07</b></div>
+            <div class="stat-row">ACTIVE EXPERIMENTS <b class="g">03</b></div>
+            <div class="stat-row">OPEN QUESTIONS <b>19</b></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SEC.05 ABOUT ================= -->
+<section class="sec" id="about">
+  <div class="wrap">
+    <header class="sec-hd rv">
+      <div class="sec-path"><span class="decode" data-text="~/valbeta/about --who">~/valbeta/about --who</span><span class="cursor">▍</span></div>
+      <div class="sec-row">
+        <h2>Who is Val?<span class="sec-cn">关于 Val</span></h2>
+        <div class="sec-meta"><span class="idx">SEC.05</span><span>A PERSON, RUN AS A LABORATORY.</span></div>
+      </div>
+    </header>
+
+    <!-- layer 1 -->
+    <div class="about-l1">
+      <div class="line rv">Product thinker.</div>
+      <div class="line rv" style="--d:.12s">Innovation researcher.</div>
+      <div class="line rv" style="--d:.24s">Business experimenter.</div>
+    </div>
+    <p class="about-l1-cn rv">产品思考者 · 创新研究者 · 商业实验者</p>
+
+    <!-- layer 2 : path, not resume -->
+    <div class="path rv">
+      <div class="path-step">
+        <span class="ps-ix">PHASE 01</span>
+        <div class="ps-role">A Product Fanatic</div>
+        <div class="ps-zh">产品人出身</div>
+        <p class="ps-note">Product manager. Learned scale — and its constraints.</p>
+      </div>
+      <div class="path-step">
+        <span class="ps-ix">PHASE 02</span>
+        <div class="ps-role">Startup Incubator</div>
+        <div class="ps-zh">创业孵化器</div>
+        <p class="ps-note">Builder. Learned what zero-to-one actually costs.</p>
+      </div>
+      <div class="path-step">
+        <span class="ps-ix">PHASE 03</span>
+        <div class="ps-role">Business Consultant</div>
+        <div class="ps-zh">商业顾问</div>
+        <p class="ps-note">Strategist. Collected failure patterns across industries.</p>
+      </div>
+      <div class="path-step now">
+        <span class="ps-ix">PHASE 04 · NOW <span class="status-dot" style="margin-left:6px"></span></span>
+        <div class="ps-role">Independent Researcher</div>
+        <div class="ps-zh">独立研究者</div>
+        <p class="ps-note">Val_beta. Experimenting, Evolving in the complex system world.</p>
+      </div>
+    </div>
+
+    <!-- layer 3 : belief -->
+    <blockquote class="belief rv">
+      <p>I believe innovation is not about creating more. It is about discovering <em>better systems</em>.</p>
+      <div class="zh">我相信，创新不是创造更多，而是发现更好的系统。</div>
+      <div class="sig">— VAL · 陆尧 / FOUNDER, VAL_BETA LAB</div>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ================= SEC.06 CONNECT ================= -->
+<section class="sec" id="connect">
+  <div class="wrap cn-grid">
+    <div class="cn-left">
+      <header class="sec-hd rv" style="margin-bottom:30px">
+        <div class="sec-path"><span class="decode" data-text="~/valbeta/connect --open">~/val_beta/connect --open</span><span class="cursor">▍</span></div>
+        <h2>Open Collaboration<span class="sec-cn">开放协作</span></h2>
+      </header>
+      <p class="cn-lead rv">If you are researching, building, or re-designing a system — bring your loop. Let’s run one experiment together.
+        <span class="zh">如果你正在研究、构建或重构某个系统，欢迎带着你的「回路」来，一起做一次实验。</span>
+      </p>
+      <ul class="cn-for">
+        <li class="rv"><span class="ix">FOR / 01</span><b>Researchers</b><span>研究者</span></li>
+        <li class="rv" style="--d:.08s"><span class="ix">FOR / 02</span><b>Builders</b><span>构建者</span></li>
+        <li class="rv" style="--d:.16s"><span class="ix">FOR / 03</span><b>Entrepreneurs</b><span>创业者</span></li>
+        <li class="rv" style="--d:.24s"><span class="ix">FOR / 04</span><b>Companies</b><span>组织</span></li>
+      </ul>
+    </div>
+    <div class="cn-right rv" style="--d:.15s">
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>val_beta:~</span></div>
+        <div class="term-body">
+          <p><span class="t-p">$</span> open collaboration --with Val</p>
+          <p class="t-out">→ 3 channels found · response time &lt; 48h · <b>beta-friendly</b></p>
+        </div>
+      </div>
+      <a class="cn-btn" href="https://github.com/valbeta/new-loop-theory" target="_blank" rel="noopener">GITHUB <span>github.com/valbeta ↗</span></a>
+      <a class="cn-btn" href="https://www.linkedin.com/" target="_blank" rel="noopener">LINKEDIN <span>linkedin.com/in/val_beta ↗</span></a>
+      <a class="cn-btn" href="mailto:hello@valbeta.fun">EMAIL <span>hello@valbeta.fun ↗</span></a>
+      <p class="cn-note">// every idea deserves <b>one experiment</b> · 每个想法都值得一次实验</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="ft">
+  <div class="wrap">
+    <div class="ft-top">
+      <div class="ft-mark" aria-hidden="true">VAL<span>β</span>BETA</div>
+      <p class="ft-creed">Ideas are never finished. They evolve through experiments.<span>思想不是被发布，而是在实验中持续进化。</span></p>
+    </div>
+    <div class="ft-cols">
+      <div class="ft-col">
+        <h5>INDEX</h5>
+        <a href="#experiments">Experiments · 实验</a>
+        <a href="#frameworks">Frameworks · 思想资产</a>
+        <a href="#log">Notes · 研究日志</a>
+        <a href="#about">About · 关于 Val</a>
+        <a href="#connect">Contact · 合作</a>
+      </div>
+      <div class="ft-col">
+        <h5>PROTOCOL</h5>
+        <p class="dim">Beta-first thinking · 永远以 Beta 状态思考</p>
+        <p class="dim">Open thinking layer · 公开思想资产</p>
+        <p class="dim">Version everything · 为一切标注版本</p>
+        <p class="dim">Ideas evolve in public · 在公开中进化</p>
+      </div>
+      <div class="ft-col">
+        <h5>SYSTEM</h5>
+        <p class="dim">domain: valbeta.fun</p>
+        <p class="dim">stack: next.js · tailwind · mdx <span style="opacity:.5">(roadmap)</span></p>
+        <p class="dim">mode: independent laboratory</p>
+        <p class="dim">next release: new-loop-theory v0.8</p>
+      </div>
+    </div>
+    <div class="ft-bar">
+      <span>© 2026 VAL BETA · valbeta.fun</span>
+      <span class="ft-build vtag" data-tip="deployed 17 Sep 2026 · 09:41 UTC" tabindex="0">BUILD v0.7.2</span>
+      <span class="run"><span class="status-dot"></span>ALL EXPERIMENTS RUNNING</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- deterministic pseudo-random ---------- */
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+  /* ---------- hero entrance ---------- */
+  var hero=document.getElementById("hero");
+  if(hero){ requestAnimationFrame(function(){ setTimeout(function(){ hero.classList.add("loaded"); },80); }); }
+
+  /* ---------- reduced motion: stop SMIL pulses ---------- */
+  if(RM){ document.querySelectorAll("animateMotion").forEach(function(a){ a.remove(); }); }
+
+  /* ---------- scroll reveal ---------- */
+  var rvEls=document.querySelectorAll(".rv");
+  if(RV_OK()){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+    },{threshold:.12,rootMargin:"0px 0px -6% 0px"});
+    rvEls.forEach(function(el){ io.observe(el); });
+  } else { rvEls.forEach(function(el){ el.classList.add("in"); }); }
+  function RV_OK(){ return !RM && "IntersectionObserver" in window; }
+
+  /* ---------- scramble decode ---------- */
+  var CHARS="#/<>[]{}=+*01β";
+  function decode(el){
+    var final=el.getAttribute("data-text")||el.textContent;
+    if(RM){ el.textContent=final; return; }
+    var frame=0, total=Math.max(16, final.length*2);
+    (function tick(){
+      frame++;
+      var shown=Math.floor((frame/total)*final.length), out="";
+      for(var i=0;i<final.length;i++){
+        var ch=final.charAt(i);
+        out += (ch===" ") ? " " : (i<shown ? ch : CHARS.charAt(Math.floor(Math.random()*CHARS.length)));
+      }
+      el.textContent=out;
+      if(frame<total){ requestAnimationFrame(tick); } else { el.textContent=final; }
+    })();
+  }
+  var decs=document.querySelectorAll(".decode");
+  if(!RM && "IntersectionObserver" in window){
+    var dio=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ decode(e.target); dio.unobserve(e.target); } });
+    },{threshold:.6});
+    decs.forEach(function(el){ dio.observe(el); });
+  }
+
+  /* ---------- nav scrollspy ---------- */
+  var links=document.querySelectorAll(".hd-nav a");
+  if("IntersectionObserver" in window){
+    var spy=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          var id=e.target.id;
+          links.forEach(function(a){ a.classList.toggle("on", a.getAttribute("href")==="#"+id); });
+        }
+      });
+    },{rootMargin:"-38% 0px -55% 0px"});
+    ["experiments","frameworks","log","about","connect"].forEach(function(id){
+      var el=document.getElementById(id); if(el) spy.observe(el);
+    });
+  }
+
+  /* ---------- framework index highlight ---------- */
+  var fwItems=document.querySelectorAll(".fw-item");
+  if("IntersectionObserver" in window){
+    var fio=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          fwItems.forEach(function(a){ a.classList.toggle("is-on", a.getAttribute("href")==="#"+e.target.id); });
+        }
+      });
+    },{rootMargin:"-30% 0px -55% 0px"});
+    ["fw-4q2i","fw-loop"].forEach(function(id){ var el=document.getElementById(id); if(el) fio.observe(el); });
+  }
+
+  /* ---------- mobile menu ---------- */
+  var mb=document.getElementById("menuBtn");
+  if(mb){
+    mb.addEventListener("click",function(){
+      var open=document.body.classList.toggle("nav-open");
+      mb.setAttribute("aria-expanded", open ? "true" : "false");
+      mb.textContent = open ? "CLOSE" : "MENU";
+    });
+    document.getElementById("hdNav").addEventListener("click",function(e){
+      if(e.target.closest("a")){ document.body.classList.remove("nav-open"); mb.textContent="MENU"; mb.setAttribute("aria-expanded","false"); }
+    });
+  }
+
+  /* ---------- experiment sparklines ---------- */
+  document.querySelectorAll(".spark").forEach(function(s){
+    var rnd=mulberry32(parseInt(s.getAttribute("data-seed"),10)||1), html="";
+    for(var i=0;i<16;i++){
+      var v=18+Math.round(rnd()*82);
+      html+='<i style="height:'+v+'%"'+(rnd()>.84?' class="hot"':'')+'></i>';
+    }
+    s.innerHTML=html;
+  });
+
+  /* ---------- contribution graph ---------- */
+  var cg=document.getElementById("contrib");
+  if(cg){
+    var rnd=mulberry32(20260917), WEEKS=32, DAYS=7;
+    var scale=["#161B22","#0E4429","#006D32","#26A641","#3FB950"];
+    var anchor=new Date(2026,8,17); /* 17 Sep 2026 */
+    var total=WEEKS*DAYS, html="";
+    for(var w=0;w<WEEKS;w++){
+      for(var d=0;d<DAYS;d++){
+        var r=rnd(), lvl=0;
+        if(r>.38)lvl=1; if(r>.62)lvl=2; if(r>.82)lvl=3; if(r>.93)lvl=4;
+        var idx=w*DAYS+d;
+        var dt=new Date(anchor.getTime()-(total-1-idx)*86400000);
+        var label=(dt.getMonth()+1)+"."+dt.getDate()+" · "+lvl+" commit"+(lvl===1?"":"s");
+        html+='<i class="cc" style="background:'+scale[lvl]+'" title="'+label+'"></i>';
+      }
+    }
+    cg.innerHTML=html;
+  }
+})();
+</script>
+</body>
+</html>

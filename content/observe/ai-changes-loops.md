@@ -3,7 +3,7 @@ title: "AI Changes Loops, Not Features"
 description: "A field note on how AI is changing the product manager's working system."
 date: "2026-03-14"
 status: "published"
-tags: [ai, product, observation]
+tags: [ai, product, observation, "ai-augmented product"]
 ---
 
 ## A first signal
